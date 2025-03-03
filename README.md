@@ -1,6 +1,6 @@
 # 🛡️ SYSTEM OVERVIEW
 
-## 🔐 System Name: **SecurePass Vault – Encrypted Password Manager**
+## 🔐 **SecurePass Vault – Encrypted Password Manager** 🔐
 
 ### 🎯 Purpose
 SecurePass Vault is a **privacy-focused password management system** designed to help users **generate, store, and retrieve secure passwords** without relying on cloud storage. It ensures maximum security through:  
