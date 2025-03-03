@@ -16,7 +16,6 @@ SecurePass Vault is a **privacy-focused password management system** designed to
 ✅ **Securely Stores Credentials** – Encrypts and saves passwords locally or in a decentralized vault.  
 ✅ **Auto-Fill & Quick Retrieval** – Seamless login via **encrypted password retrieval**.  
 ✅ **Two-Factor & Biometric Authentication** – Adds an extra security layer for access control.  
-✅ **Blockchain-Based Integrity Check** – Prevents tampering by hashing stored credentials.  
 ✅ **Offline Access & Secure USB Syncing** – Ensures availability without internet dependency.  
 
 ---
@@ -37,23 +36,12 @@ SecurePass Vault is a **privacy-focused password management system** designed to
 ✔️ **Encrypted Password Vault**  
 &emsp;🔹 Secured with **AES-256 encryption**.  
 
-✔️ **Auto-Fill & Encrypted Retrieval**  
-&emsp;🔹 Enables quick and **secure access** without revealing passwords.  
-
-✔️ **Decentralized Storage with Blockchain**  
-&emsp;🔹 Stores password hashes on a **distributed ledger** for tamper-proof protection.  
 
 ✔️ **Multi-Factor Authentication (MFA) Support**  
 &emsp;🔹 Supports **hardware security keys (YubiKey, TOTP)** or biometrics.  
 
 ✔️ **Offline Access & USB-Based Syncing**  
 &emsp;🔹 Access passwords securely across devices **without an internet connection**.  
-
-✔️ **Breach Monitoring & Security Alerts**  
-&emsp;🔹 Scans for **leaked credentials** in breach databases.  
-
-✔️ **Self-Destruct Mechanism**  
-&emsp;🔹 Erases credentials after multiple failed access attempts.  
 
 ---
 
