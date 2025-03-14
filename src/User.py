@@ -1,6 +1,5 @@
 from Data import UserData
 from DataFileHandler import DataFileHandler
-from email_validator import validate_email, EmailNotValidError
 
 
 class User:
@@ -9,14 +8,11 @@ class User:
         self.username: str = ""
         self.__password: str = ""
         self.is_mfa_enabled: bool = False
+        self.mfa_auth_data: UserData
 
     @property
     def user_id(self) -> str:
         return self.__user_id
-
-    @property
-    def email(self) -> object:
-        return self.__raise_value_error()
 
     @property
     def password(self) -> object:
@@ -25,14 +21,6 @@ class User:
     @user_id.setter
     def user_id(self, user_id: str) -> None:
         self.__user_id = user_id
-
-    @email.setter
-    def email(self, email) -> None:
-        try:
-            validate_email(email)
-            self._email = email
-        except EmailNotValidError as e:
-            raise ValueError(e)
 
     @password.setter
     def password(self, password) -> None:
@@ -46,8 +34,10 @@ class User:
         if not file.search("username", self.username):
             raise ValueError("User is not registered.")
 
-        if file.select_password(self._email) == self.__password:
-            return file.select_all(self._email)
+        stored_password = file.select("username", self.username, "password")
+
+        if stored_password == self.__password:
+            return file.select_all(self.username)
 
     def signup(self) -> None:
         file = DataFileHandler()
