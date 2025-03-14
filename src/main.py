@@ -22,7 +22,7 @@ def main() -> None:
 
                             if not user: continue
 
-                            choice: int = UserInterface.home()
+                            choice: int = UserInterface.home(user.user_id, user.username, user.is_mfa_enabled)
 
                             match choice:
                                 case 1:
