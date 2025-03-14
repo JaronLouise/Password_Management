@@ -20,9 +20,9 @@ def signup() -> None:
 
     try:
         user = User()
-        user.username = input("Username: ")
-        password = pwinput("Password: ", mask="*")
-        confirm_password = pwinput("Confirm Password: ", mask="*")
+        user.username = input("\tUsername: ")
+        password = pwinput("\tPassword: ", mask="*")
+        confirm_password = pwinput("\tConfirm Password: ", mask="*")
 
         if password != confirm_password:
             raise Exception("Passwords aren't matching.")
@@ -43,7 +43,7 @@ def signin() -> int:
 
     print("\t[1] Using username and password.")
     print("\t[2] Using OTP sent via email.")
-    print("\t[3] Using OTP sent via contact number.")
+    print("\t[3] Using OTP sent via phone number.")
     print("\t[0] Exit")
 
     layout_sections("BODY")
@@ -97,8 +97,24 @@ def home(user_id: str, username: str, mfa_enabled: bool):
     return int(input("Choice: "))
 
 
+def access_mfa_auth_data(user: User):
+    layout_sections("HEADER", "SecurePass - MFA")
+    
+    if user.is_mfa_enabled:
+        print("\t[1] Modify email.")
+        print("\t[2] Modify phone number.")
+    else:
+        print("\t[1] Add email.")
+        print("\t[2] Add phone number.")
+
+    print("\t[0] Exit")
+    layout_sections("BODY")
+
+    return int(input("Choice: "))
+
+
 def layout_sections(section: str, section_name: str = "") -> None:
-    length = 52
+    length = 60
 
     if section == "HEADER" and section_name:
         print("\033c", end="")
