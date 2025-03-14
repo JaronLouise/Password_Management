@@ -1,4 +1,4 @@
-from UserData import UserData
+from Data import UserData
 from DataFileHandler import DataFileHandler
 from email_validator import validate_email, EmailNotValidError
 
@@ -7,7 +7,6 @@ class User:
     def __init__(self):
         self.__user_id: str = ""
         self.username: str = ""
-        self._email: str = ""
         self.__password: str = ""
         self.is_mfa_enabled: bool = False
 
@@ -44,8 +43,8 @@ class User:
         file.filename = "secure-pass_registered-user.txt"
         file.initialize_file_storage()
 
-        if not file.search("email", self._email):
-            raise ValueError("Email is not registered.")
+        if not file.search("username", self.username):
+            raise ValueError("User is not registered.")
 
         if file.select_password(self._email) == self.__password:
             return file.select_all(self._email)
@@ -57,8 +56,8 @@ class User:
         file.filename = "secure-pass_registered-user.txt"
         file.initialize_file_storage()
 
-        if file.search("email", self._email):
-            raise ValueError("Email is already registered.")
+        if file.search("username", self.username):
+            raise ValueError("Username is already used.")
 
         file.insert(data)
 
@@ -73,8 +72,8 @@ class User:
         user: UserData = {
             "user_id": self.__user_id,
             "username": self.username,
-            "email": self._email,
             "password": self.__password,
-            "is_mfa_enabled": self.is_mfa_enabled
+            "is_mfa_enabled": self.is_mfa_enabled,
+            "mfa_auth": {}
         }
         return user
