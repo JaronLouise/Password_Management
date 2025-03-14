@@ -1,7 +1,6 @@
 from typing import List
-
-import UserData
 from pathlib import Path
+from Data import UserData
 from json import dump, load, dumps, JSONDecodeError
 
 
@@ -37,9 +36,9 @@ class DataFileHandler:
         for user in users:
             if user["user_id"] == data["user_id"]:
                 user["username"] = data["username"]
-                user["email"] = data["email"]
                 user["password"] = data["password"]
                 user["is_mfa_enabled"] = data["is_mfa_enabled"]
+                user["mfa_auth"] = data["mfa_auth"]
 
         file_path = Path(self.filename)
         try:
