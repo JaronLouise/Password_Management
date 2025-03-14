@@ -14,25 +14,33 @@ def main() -> None:
                 case 1:
                     UserInterface.signup()
                 case 2:
-                    user: User = UserInterface.signin()
-                    choice: int = UserInterface.home()
+                    choice: int = UserInterface.signin()
 
                     match choice:
                         case 1:
-                            print("View stored accounts.")
+                            user: User = UserInterface.username_password_signin()
+
+                            if not user: continue
+
+                            choice: int = UserInterface.home()
+
+                            match choice:
+                                case 1:
+                                    print("View stored accounts.")
+                                case 2:
+                                    print("Add new account.")
+                                case 3:
+                                    print("Sync to USB.")
+                                case 4:
+                                    print("Sync from USB.")
+                                case 0:
+                                    user.signout()
                         case 2:
-                            print("Add new account.")
+                            print("sign in with email.")
                         case 3:
-                            print("Sync to USB.")
-                        case 4:
-                            print("Sync from USB.")
-                        case 0:
-                            user.signout()
+                            print("sign in using contact number.")
                 case 0:
                     exit(1)
-
-            print("Press any key to continue...\n", end="")
-            input()
 
         except ValueError:
             print("Enter a number in range 0-2.")
