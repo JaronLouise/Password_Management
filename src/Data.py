@@ -11,4 +11,4 @@ class UserData(TypedDict):
 
 class MfaData(TypedDict):
     email: str
-    contact_number: str
+    phone_number: str
