@@ -49,29 +49,29 @@ class DataFileHandler:
         except Exception as e:
             raise OSError(f"Update failed: {e}")
 
-    def select_all(self, email: str = "") -> List[dict]:
+    def select_all(self, username: str = "") -> List[dict]:
         file_path = Path(self.filename)
 
         try:
             with file_path.open("r", encoding="utf-8") as file:
                 data = load(file)
 
-            if not email:
+            if not username:
                 return data
 
             for d in data:
-                if d["email"] == email:
+                if d["username"] == username:
                     return [d]
 
         except JSONDecodeError:
             return []
 
-    def select_password(self, email) -> str:
+    def select(self, key, value, search_key) -> str:
         users = self.select_all()
 
         for user in users:
-            if user["email"] == email:
-                return user["password"]
+            if user[key] == value:
+                return user[search_key]
 
     def search(self, key, value) -> bool:
         users = self.select_all()
