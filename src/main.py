@@ -27,9 +27,9 @@ def main() -> None:
 
                                 match choice:
                                     case 1:
-                                        print("View stored accounts.")
+                                        UserInterface.view_accounts(user.user_id)
                                     case 2:
-                                        print("Add new account.")
+                                        UserInterface.add_account(user.user_id)
                                     case 3:
                                         print("Sync to USB.")
                                     case 4:
