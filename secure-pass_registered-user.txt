@@ -1,0 +1,62 @@
+[
+    {
+        "user_id": "139213a8-612f-47f8-b79c-2b68a7a9903c",
+        "username": "danielleziac",
+        "password": "mamamo",
+        "is_mfa_enabled": false,
+        "mfa_auth": {
+            "email": "",
+            "phone_number": ""
+        }
+    },
+    {
+        "user_id": "ba597d2e-ab70-444b-bc87-98f45be82c29",
+        "username": "1",
+        "password": "mama12",
+        "is_mfa_enabled": false,
+        "mfa_auth": {
+            "email": "",
+            "phone_number": ""
+        }
+    },
+    {
+        "user_id": "1d5277e3-095b-4070-a8c0-540e7d88bab6",
+        "username": "0",
+        "password": "0",
+        "is_mfa_enabled": false,
+        "mfa_auth": {
+            "email": "",
+            "phone_number": ""
+        }
+    },
+    {
+        "user_id": "6acca338-69d1-4dd7-9b0f-55aed518bf41",
+        "username": "o1",
+        "password": "k1",
+        "is_mfa_enabled": false,
+        "mfa_auth": {
+            "email": "",
+            "phone_number": ""
+        }
+    },
+    {
+        "user_id": "1cd094a4-6a46-4838-8386-b0c71ca30d86",
+        "username": "Danielle",
+        "password": "Danielle",
+        "is_mfa_enabled": false,
+        "mfa_auth": {
+            "email": "",
+            "phone_number": ""
+        }
+    },
+    {
+        "user_id": "63ad8a4f-4adb-4e94-8f69-4c76f634ddd0",
+        "username": "Ok",
+        "password": "Ok",
+        "is_mfa_enabled": false,
+        "mfa_auth": {
+            "email": "",
+            "phone_number": ""
+        }
+    }
+]

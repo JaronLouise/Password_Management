@@ -49,7 +49,6 @@ def validate_field_input(field_name: str, value: str) -> bool:
             return False
     return True
 
-
 def landing_interface() -> int:
     """Landing page. Get user choice."""
     error_message = ""
@@ -100,11 +99,25 @@ def signup() -> None:
             input("\nPress any key to try again...")
             continue  # Restart input prompt
 
+        # Request and set the master password
+        while True:
+            master_password = pwinput("\tCreate your master password: ", mask="*")
+            confirm_master_password = pwinput("\tConfirm master password: ", mask="*")
+            if master_password == confirm_master_password:
+                # Use PasswordVault to hash the master password and store it
+                vault = PasswordVault(master_password)
+                hashed_master_password = vault.hash_password_pbkdf2(master_password)  # Hash the master password using PBKDF2
+                vault.store_hashed_password(user.user_id, hashed_master_password)  # Store the hashed password securely
+                print("\tMaster password set successfully!")
+                break
+            else:
+                print("\n\t❌ Passwords do not match. Please try again.")
+
         # Successful signup
         try:
-            user.password = password
+            user.password = password  # Store plain password if needed
             user.user_id = str(uuid4())
-            user.signup()
+            user.signup()  # This will handle user registration in your User class (saving username, user_id, etc.)
             print("\n✅ Registered successfully!")
             break  # Exit loop upon success
         except Exception as e:
@@ -187,7 +200,8 @@ def access_mfa_auth_data(user: User):
     return int(input("Choice: "))
   
 def add_account(user_id: str):
-    vault = PasswordVault()
+    master_password = pwinput("\tEnter your master password: ", mask="*")
+    vault = PasswordVault(master_password)  # Initialize with the master password
     layout_sections("HEADER", "Add New Account")
 
     try:
@@ -228,10 +242,10 @@ def add_account(user_id: str):
                     password = pwinput("\tPassword: ", mask="*")
                     if validate_field_input("Password", password):  # Using the validate function
                         break
-                    # print_validation_error("Password") is automatically called by validate_field_input
+                    
             else:
                 print("\n\t❌ Invalid choice. Please try again.")
-                return  # Exit the function if invalid choice
+                return 
 
             # Store the new account
             vault.store_account(user_id, website, email, password)
@@ -242,21 +256,28 @@ def add_account(user_id: str):
         layout_sections("FOOTER")
 
 def view_accounts(user_id: str):
-    vault = PasswordVault()
-    layout_sections("HEADER", "View Stored Accounts")
+    master_password = pwinput("\tEnter your master password: ", mask="*")
+    vault = PasswordVault(master_password)
 
+    if not vault.authenticate():
+        print("Incorrect master password. Access denied.")
+        return
+
+    layout_sections("HEADER", "View Stored Accounts")
     try:
-        websites = vault.get_stored_websites(user_id)
+        # Using load_vault directly if there is no get_stored_websites method
+        vault_data = vault.load_vault()
+        websites = list(vault_data.get(user_id, {}).keys())  # Get list of websites for user_id
+
         if not websites:
             print("\nNo stored accounts found.")
             return
         
         print("\nStored Websites:")
-        websites_to_display = []  # A list to store websites with accounts
-        
-        # Filter websites that have accounts
+        websites_to_display = []
+
         for website in websites:
-            accounts = vault.load_vault().get(user_id, {}).get(website, [])
+            accounts = vault_data.get(user_id, {}).get(website, [])
             if accounts:
                 websites_to_display.append(website)
             else:
@@ -265,42 +286,46 @@ def view_accounts(user_id: str):
         if not websites_to_display:
             print("\nNo websites with stored accounts.")
             return
-        
-        # Display the websites that have accounts
+
         for i, website in enumerate(websites_to_display, 1):
             print(f"\t[{i}] {website}")
-        
+
         website_choice = input("\nEnter the website to view credentials: ").strip()
-        
-        # Ensure the website exists before accessing accounts
+
         if website_choice not in websites_to_display:
             print("\nInvalid website selection.")
             return
 
-        accounts = vault.load_vault().get(user_id, {}).get(website_choice, [])
+        accounts = vault_data.get(user_id, {}).get(website_choice, [])
 
         if accounts:
             for account in accounts:
                 print(f"\nEmail: {account['email']}")
                 print(f"Password: {account['password']}")
-            
-            # Ask if the user wants to edit or delete accounts
+
             choice = input("\n[1] Edit account\n[2] Delete account\n[0] Go back: ").strip()
-            if choice == "1":
-                # Edit the account
-                edit_account(user_id, website_choice)
-            elif choice == "2":
-                # Delete the account
-                delete_account(user_id, website_choice, accounts)
+
+            if choice in ("1", "2"):
+                master_password = input("Enter master password to confirm: ").strip()
+                vault = PasswordVault(master_password)
+
+                if not vault.authenticate():
+                    print("Incorrect master password. Action denied.")
+                    return
+
+                if choice == "1":
+                    edit_account(user_id, website_choice)
+                elif choice == "2":
+                    delete_account(user_id, website_choice, accounts)
             elif choice == "0":
                 print("\nGoing back.")
         else:
             print("\nNo credentials found for this website.")
     except Exception as e:
-        print(e)
+        print(f"Error while viewing accounts: {e}")
     finally:
         layout_sections("FOOTER")
-
+        
 def edit_account(user_id: str, website: str):
     vault = PasswordVault()
     email = input("\nEnter the email of the account you want to edit: ").strip()
