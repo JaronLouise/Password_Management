@@ -42,8 +42,19 @@ def main() -> None:
                                                 UserInterface.layout_sections("HEADER", "SecurePass - Add Email")
                                                 email = input("\tEmail: ")
 
-                                                user.email = email
+                                                verified = user.verify_email(email)
+                                                if verified:
+                                                    print("\t✅ Email successfully added.")
+                                                else:
+                                                    while True:
+                                                        print("\t❌ Error verifying email.")
+                                                        print("\t[1] Resend Verification.")
+                                                        print("\t [0] Exit")
+                                                        UserInterface.layout_sections("BODY")
+                                                        choice = int(input("Choice: "))
 
+                                                        if choice == 0: break
+                                                    
                                                 UserInterface.layout_sections("FOOTER")
                                     case 0:
                                         user.signout()
