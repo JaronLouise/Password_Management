@@ -1,7 +1,7 @@
-import sendgrid
-from sendgrid.helpers.mail import Mail
 from Data import UserData, MfaData
+from PasswordVault import PasswordVault
 from DataFileHandler import DataFileHandler
+from VerificationService import VerificationService
 from email_validator import validate_email, EmailNotValidError
 
 class User:
@@ -31,21 +31,17 @@ class User:
 
     @user_id.setter
     def user_id(self, user_id: str) -> None:
-        self.__user_id = user_id
+        if not self.__user_id:
+            self.__user_id = user_id
 
     @password.setter
     def password(self, password) -> None:
-        self.__password = password
+        if not self.__password:
+            self.__password = password
 
     @email.setter
     def email(self, email):
-        try:
-            validate_email(email)
-            self.send_no_reply_email(email)
-
-            self._email = email
-        except EmailNotValidError:
-            raise ValueError("Email is not valid.")
+        self._email = email
 
     def signin(self) -> list:
         file = DataFileHandler()
@@ -76,20 +72,38 @@ class User:
         print("Signed-out.")
         del self
 
-    def send_no_reply_email(self, email):
-        sg = sendgrid.SendGridAPIClient("your_sendgrid_api_key")
-        email = Mail(
-            from_email="noreply@yourdomain.com",
-            to_emails=email,
-            subject="No-Reply Email",
-            plain_text_content="This is an automated email. Please do not reply."
-        )
-
+    def verify_email(self, email: str) -> bool:
         try:
-            response = sg.send(email)
-            print(f"Email sent! Status code: {response.status_code}")
-        except Exception as e:
-            print(f"Failed to send email: {e}")
+            validate_email(email)
+
+            verification_code = PasswordVault().generate_password(6)
+            email_body = f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Email Verification</title>
+                </head>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h1>Verify Your Email Address</h1>
+                    <p>You need to verify your email address to enable multi-factor authentication (MFA). Enter the following code to verify your email:</p>
+                    <h2 style="background-color: #f4f4f4; padding: 10px; display: inline-block;">{verification_code}</h2>
+                    <p><i>The request for this access originated from SecurePass.</i></p>
+                </body>
+                </html>
+            """
+
+            VerificationService.send_email(
+                email, 
+                "SecurePass Email Verification", 
+                email_body
+            )
+            i_verification_code = input("\tVerification Code: ")
+            return i_verification_code == verification_code
+        except EmailNotValidError:
+            print("\t❌Error: Email not accepted.")
+
+        def verify_phone_number(self, phone_number: str) -> bool:
+            """ send text message """
 
     def __raise_value_error(self) -> object:
         raise AttributeError("Cannot access this attribute directly.")
