@@ -2,6 +2,7 @@ import UserInterface
 from User import User
 
 
+
 def main() -> None:
     while True:
         try:

@@ -4,6 +4,8 @@ from uuid import uuid4
 from User import User
 from pwinput import pwinput
 from PasswordVault import PasswordVault
+from MFA import MFA
+
 
 def is_valid_email(email: str) -> bool:
     """Validate email format."""
@@ -367,3 +369,40 @@ def layout_sections(section: str, section_name: str = "") -> None:
         print("\033c", end="")
     elif section == "BODY":
         print(f"\n{'=' * length}")
+
+def login():
+    user_email = input("Enter your email: ")
+    mfa = MFA(user_email)
+
+    print("\nChoose MFA Method:")
+    print("1. TOTP (Google Authenticator)")
+    print("2. Email OTP")
+
+    choice = input("Enter choice (1/2): ")
+
+    if choice == "1":
+        print("Your TOTP is:", mfa.generate_totp())
+        user_input = input("Enter TOTP: ")
+        if mfa.verify_totp(user_input):
+            print("✅ TOTP Authentication Successful!")
+        else:
+            print("❌ Invalid TOTP!")
+            return False
+
+    elif choice == "2":
+        sender_email = "your_email@gmail.com"
+        sender_password = "your_email_password"  # Store securely
+        mfa.send_email_otp(sender_email, sender_password)
+
+        user_input = input("Enter Email OTP: ")
+        if mfa.verify_email_otp(user_input):
+            print("✅ Email OTP Authentication Successful!")
+        else:
+            print("❌ Invalid Email OTP!")
+            return False
+    else:
+        print("Invalid choice!")
+        return False
+
+    print("🎉 Login successful!")
+    return True

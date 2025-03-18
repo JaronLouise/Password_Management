@@ -1,0 +1,12 @@
+[
+    {
+        "user_id": "0a233a4c-e82c-4120-9532-2febbebb67a5",
+        "username": "lawrencio_28",
+        "password": "1234",
+        "is_mfa_enabled": false,
+        "mfa_auth": {
+            "email": "",
+            "phone_number": ""
+        }
+    }
+]
