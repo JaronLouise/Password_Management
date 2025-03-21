@@ -4,7 +4,7 @@ from uuid import uuid4
 from User import User
 from pwinput import pwinput
 from PasswordVault import PasswordVault
-from MFA import MFA
+from MultiFactorAuth import MultiFactorAuth
 
 
 def is_valid_email(email: str) -> bool:
@@ -372,7 +372,7 @@ def layout_sections(section: str, section_name: str = "") -> None:
 
 def login():
     user_email = input("Enter your email: ")
-    mfa = MFA(user_email)
+    mfa = MultiFactorAuth(user_email)
 
     print("\nChoose MFA Method:")
     print("1. TOTP (Google Authenticator)")
@@ -406,3 +406,23 @@ def login():
 
     print("🎉 Login successful!")
     return True
+
+
+def add_email(user: User) -> None:
+    layout_sections("HEADER", "SecurePass - Add Email")
+    email = input("\tEmail: ")
+
+    verified = user.verify_email(email)
+    if verified:
+        print("\t✅ Email successfully added.")
+    else:
+        while True:
+            print("\t❌ Error verifying email.")
+            print("\t[1] Resend Verification.")
+            print("\t [0] Exit")
+            layout_sections("BODY")
+            choice = int(input("Choice: "))
+
+            if choice == 0: break
+        
+    layout_sections("FOOTER")
