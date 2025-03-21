@@ -2,32 +2,68 @@ import os
 import json
 import random
 import string
+from EncryptionData import EncryptionData
 
 class PasswordVault:
-    def __init__(self):
-        self.file_path = "vault_data.json"
+    def __init__(self, vault_file="vault_data.json"):
+        self.vault_file = vault_file
+        self.encryption = EncryptionData()
+        self.vault_data = self.load_vault()
 
     def load_vault(self):
-        if not os.path.exists(self.file_path):
+        """Load vault data from file, decrypting passwords inside."""
+        if not os.path.exists(self.vault_file):
             return {}
-        with open(self.file_path, "r") as file:
-            try:
-                data = json.load(file)
-                if not isinstance(data, dict):  # Ensure vault data is a dictionary
-                    return {}
-                return data
-            except json.JSONDecodeError:
-                return {}
 
-    def save_vault(self, data):
-        if isinstance(data, dict):  # Ensure data is a dictionary before saving
-            with open(self.file_path, "w") as file:
-                json.dump(data, file, indent=4)
+        with open(self.vault_file, "r") as file:
+            data = json.load(file)
+
+        decrypted_data = {}
+
+        for user_id, websites in data.items():
+            decrypted_data[user_id] = {}
+            for site, accounts in websites.items():
+                decrypted_accounts = []
+                for account in accounts:
+                    decrypted_password = self.encryption.decrypt(account["password"])
+                    decrypted_accounts.append({
+                        "email": account["email"],
+                        "password": decrypted_password
+                    })
+                decrypted_data[user_id][site] = decrypted_accounts
+
+        return decrypted_data
+
+    def save_vault(self, vault_data):
+        """Save vault data to file, encrypting all passwords before saving."""
+        encrypted_data = {}
+
+        for user_id, websites in vault_data.items():
+            encrypted_data[user_id] = {}
+            for site, accounts in websites.items():
+                encrypted_accounts = []
+                for account in accounts:
+                    # If already encrypted (looks like gibberish base64), you can skip re-encryption, or force encrypt anyway.
+                    # Safe option: force re-encrypt by decrypting first if possible
+                    password = account["password"]
+
+                    # If this password is already plaintext (from memory), encrypt it:
+                    if not password.startswith('gAAAA'):  # Fernet encrypted strings typically start with 'gAAAA'
+                        password = self.encryption.encrypt(password)
+
+                    encrypted_accounts.append({
+                        "email": account["email"],
+                        "password": password
+                    })
+                encrypted_data[user_id][site] = encrypted_accounts
+
+        with open(self.vault_file, "w") as file:
+            json.dump(encrypted_data, file, indent=4)
 
     def store_account(self, user_id, website, email, password):
         vault_data = self.load_vault()
 
-        if not isinstance(vault_data, dict):  # Ensure vault data is a dictionary
+        if not isinstance(vault_data, dict):
             vault_data = {}
 
         if user_id not in vault_data:
@@ -39,12 +75,15 @@ class PasswordVault:
         # Check if email already exists for the website
         for account in vault_data[user_id][website]:
             if isinstance(account, dict) and account.get("email") == email:
-                return "email_exists"  # Signal that email exists for this website
+                return "email_exists"  # Email already exists
 
-        # Otherwise, add the new account
+        # ✅ Encrypt password before storing
+        encrypted_password = self.encryption.encrypt(password)
+
+        # Add new account
         vault_data[user_id][website].append({
             "email": email,
-            "password": password
+            "password": encrypted_password
         })
 
         self.save_vault(vault_data)
@@ -52,10 +91,11 @@ class PasswordVault:
 
     def update_password(self, user_id, website, email, new_password):
         vault_data = self.load_vault()
-        if isinstance(vault_data, dict) and user_id in vault_data and website in vault_data[user_id]:
+        if user_id in vault_data and website in vault_data[user_id]:
             for account in vault_data[user_id][website]:
-                if isinstance(account, dict) and account.get("email") == email:
-                    account["password"] = new_password
+                if account.get("email") == email:
+                    # Encrypt the updated password
+                    account["password"] = self.encryption.encrypt(new_password)
                     self.save_vault(vault_data)
                     return "updated"
         return "not_found"
@@ -72,13 +112,14 @@ class PasswordVault:
         vault_data = self.load_vault()
         accounts = vault_data.get(user_id, {}).get(website, [])
 
-        if isinstance(accounts, list):  # Ensure it's a list before iterating
-            for account in accounts:
-                if isinstance(account, dict) and account.get("email") == email:
-                    return {
-                        "email": account["email"],
-                        "password": account["password"]
-                    }
+        for account in accounts:
+            if account.get("email") == email:
+                # ✅ Decrypt password before returning
+                decrypted_password = self.encryption.decrypt(account["password"])
+                return {
+                    "email": account["email"],
+                    "password": decrypted_password
+                }
         return None
 
     def generate_password(self, length=12):

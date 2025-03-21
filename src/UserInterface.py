@@ -115,16 +115,27 @@ def signup() -> None:
             layout_sections("FOOTER")
 
 def signin() -> int:
-    layout_sections("HEADER", "Sign-In")
+    error_message = ""
 
-    print("\t[1] Using username and password.")
-    print("\t[2] Using OTP sent via email.")
-    print("\t[3] Using OTP sent via phone number.")
-    print("\t[0] Exit")
+    while True:
+        os.system("cls" if os.name == "nt" else "clear")
+        layout_sections("HEADER", "Sign-In")
 
-    layout_sections("BODY")
+        print("\t[1] Using username and password.")
+        print("\t[2] Using OTP sent via email.")
+        print("\t[3] Using OTP sent via phone number.")
+        print("\t[0] Exit")
 
-    return int(input("Choice: "))
+        layout_sections("BODY")
+
+        if error_message:
+            print(f"\n\t❌ {error_message}\n")
+
+        choice = input("Choice: ").strip()
+        if choice in ["0", "1", "2", "3"]:
+            return int(choice)
+
+        error_message = "Invalid input. Please try again."
 
 def username_password_signin() -> User | None:
     layout_sections("HEADER", "Sign-In")
