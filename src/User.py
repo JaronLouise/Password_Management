@@ -42,6 +42,12 @@ class User:
     @email.setter
     def email(self, email):
         self._email = email
+    
+    @phone_number.setter
+    def phone_number(self, phone_num: str) -> None:
+        if not len(phone_num) == 11 and not phone_num.startswith("09"):
+            raise Exception("\t❌ Invalid phone number format.")
+        self._phone_number
 
     def signin(self) -> list:
         file = DataFileHandler()
@@ -55,6 +61,7 @@ class User:
 
         if stored_password == self.__password:
             return file.select_all(self.username)
+        
 
     def signup(self) -> None:
         file = DataFileHandler()
@@ -71,6 +78,16 @@ class User:
     def signout(self):
         print("Signed-out.")
         del self
+
+    def update_profile(self) -> bool:
+        file = DataFileHandler()
+
+        data = self._transform_data()
+        file.filename = "secure-pass_registered-user.txt"
+        file.initialize_file_storage()
+
+        if file.search("user_id", self.__user_id):
+            return file.update(data)
 
     def verify_email(self, email: str) -> bool:
         try:
