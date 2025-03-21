@@ -142,8 +142,8 @@ def username_password_signin() -> User | None:
 
     try:
         user = User()
-        user.username = input("Username: ")
-        user.password = pwinput("Password: ", mask="*")
+        user.username = input("\tUsername: ")
+        user.password = pwinput("\tPassword: ", mask="*")
 
         data: list = user.signin()
 
@@ -152,10 +152,10 @@ def username_password_signin() -> User | None:
             user.username = data[0]["username"]
             user.is_mfa_enabled = data[0]["is_mfa_enabled"]
 
-            print("Signed in successfully!")
+            print("\t✅ Signed in successfully!")
             return user
         else:
-            print("Incorrect username or password.")
+            print("\t❌ Incorrect username or password.")
             return None
     except Exception as e:
         print(f"Error: {e}")
@@ -425,7 +425,17 @@ def add_email(user: User) -> None:
 
     verified = user.verify_email(email)
     if verified:
-        print("\t✅ Email successfully added.")
+        try:
+            user.email = email
+            user.is_mfa_enabled = True
+            updated = user.update_profile()
+
+            if not updated:
+                raise Exception("\t❌ Error in adding email as MFA.")
+
+            print("\t✅ Email successfully added.")
+        except Exception as e:
+            print(f"\t{e}")
     else:
         while True:
             print("\t❌ Error verifying email.")
