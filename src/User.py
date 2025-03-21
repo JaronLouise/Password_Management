@@ -102,8 +102,8 @@ class User:
         except EmailNotValidError:
             print("\t❌Error: Email not accepted.")
 
-        def verify_phone_number(self, phone_number: str) -> bool:
-            """ send text message """
+    def verify_phone_number(self, phone_number: str) -> bool:
+        """ send text message """
 
     def __raise_value_error(self) -> object:
         raise AttributeError("Cannot access this attribute directly.")
