@@ -42,9 +42,10 @@ class DataFileHandler:
 
         file_path = Path(self.filename)
         try:
-            with file_path.open("w", 0, "utf-8") as file:
-                for user in users:
-                    file.write(dumps(user) + "\n")
+            with file_path.open("w", 1, "utf-8") as file:
+                dump(users, file, indent=4)
+                # for user in users:
+                #     file.write(dumps(user) + "\n")
             return True
         except Exception as e:
             raise OSError(f"Update failed: {e}")
