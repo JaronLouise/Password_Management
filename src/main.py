@@ -38,9 +38,14 @@ def main() -> None:
                                     case 5: 
                                         choice: int = UserInterface.access_mfa_auth_data(user)
 
-                                        match choice:
-                                            case 1:
-                                                UserInterface.add_email(user)
+                                        if user.is_mfa_enabled:
+                                            """IMPLEMENT MODIFY"""
+                                        else:
+                                            match choice:
+                                                case 1:
+                                                    UserInterface.add_email(user)
+                                                case 2:
+                                                    """IMPLEMENT ADD PHONE"""
                                     case 0:
                                         user.signout()
                                         break
