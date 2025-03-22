@@ -214,9 +214,9 @@ def home_redirects(user: User):
             case 2:
                 add_account(user.user_id)
             case 3:
-                print("Sync to USB.")
+                sync_to_usb(user.user_id)
             case 4:
-                print("Sync from USB.")
+                sync_from_usb(user.user_id)
             case 5: 
                 choice: int = access_mfa_auth_data(user)
 
