@@ -37,8 +37,8 @@ class DataFileHandler:
             if user["user_id"] == data["user_id"]:
                 user["username"] = data["username"]
                 user["password"] = data["password"]
+                user["email"] = data["email"]
                 user["is_mfa_enabled"] = data["is_mfa_enabled"]
-                user["mfa_auth"] = data["mfa_auth"]
 
         file_path = Path(self.filename)
         try:
@@ -50,18 +50,18 @@ class DataFileHandler:
         except Exception as e:
             raise OSError(f"Update failed: {e}")
 
-    def select_all(self, username: str = "") -> List[dict]:
+    def select_all(self, key: str = "", value: str = "") -> List[dict]:
         file_path = Path(self.filename)
 
         try:
             with file_path.open("r", encoding="utf-8") as file:
                 data = load(file)
 
-            if not username:
+            if not value and not key:
                 return data
 
             for d in data:
-                if d["username"] == username:
+                if d[key] == value:
                     return [d]
 
         except JSONDecodeError:
@@ -76,7 +76,7 @@ class DataFileHandler:
 
     def search(self, key, value) -> bool:
         users = self.select_all()
-
+        
         for user in users:
             if user[key] == value:
                 return True
