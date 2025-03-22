@@ -1,7 +1,9 @@
+import os
 import pyotp
 import smtplib
-import random
-from email.message import EmailMessage
+from dotenv import load_dotenv
+from email.mime.text import MIMEText
+
 
 class MultiFactorAuth:
     def __init__(self, user_email):
@@ -19,45 +21,27 @@ class MultiFactorAuth:
         totp = pyotp.TOTP(self.__secret)
         return totp.verify(user_input)
 
-    def send_email_otp(self, sender_email, sender_password):
+    def send_email(self, subject, message) -> bool:
         """Generate and send a one-time password (OTP) via email."""
-        self.__otp = random.randint(100000, 999999)
-        msg = EmailMessage()
-        msg.set_content(f"Your OTP code is: {self.__otp}")
-        msg["Subject"] = "Your MFA OTP Code"
-        msg["From"] = sender_email
-        msg["To"] = self.email
+        load_dotenv()
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender_email, sender_password)
-            server.send_message(msg)
+        sender_email = os.getenv("ADMIN_EMAIL")
+        sender_password = os.getenv("ADMIN_PASSWORD")
 
-        print("OTP sent successfully!")
+        try:
+            msg = MIMEText(message, "html")
+            msg["Subject"] = subject
+            msg["From"] = sender_email
+            msg["To"] = self.email
+
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+                server.login(sender_email, sender_password)
+                server.send_message(msg)
+            return True
+        except Exception:
+            return False
 
     def verify_email_otp(self, user_input):
         """Verify the OTP input by the user."""
         return str(user_input) == str(self.__otp)
 
-# Example usage (Testing)
-if __name__ == "__main__":
-    user_email = "user_email@example.com"
-    mfa = MultiFactorAuth(user_email)
-
-    # Option 1: TOTP
-    print("Your TOTP is:", mfa.generate_totp())
-    user_totp = input("Enter TOTP: ")
-    if mfa.verify_totp(user_totp):
-        print("✅ TOTP Authentication Successful!")
-    else:
-        print("❌ Invalid TOTP!")
-
-    # Option 2: Email OTP
-    sender_email = "your_email@gmail.com"
-    sender_password = "your_email_password"  # Store securely
-    mfa.send_email_otp(sender_email, sender_password)
-
-    user_otp = input("Enter Email OTP: ")
-    if mfa.verify_email_otp(user_otp):
-        print("✅ Email OTP Authentication Successful!")
-    else:
-        print("❌ Invalid Email OTP!")
