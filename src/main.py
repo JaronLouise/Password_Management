@@ -14,45 +14,19 @@ def main() -> None:
             match choice:
                 case 1:
                     UserInterface.signup()
+
                 case 2:
                     choice: int = UserInterface.signin()
 
                     match choice:
                         case 1:
                             user: User = UserInterface.username_password_signin()
-
-                            if not user: continue
-
-                            while True:
-                                choice: int = UserInterface.home(user.user_id, user.username, user.is_mfa_enabled)
-
-                                match choice:
-                                    case 1:
-                                        UserInterface.view_accounts(user.user_id)
-                                    case 2:
-                                        UserInterface.add_account(user.user_id)
-                                    case 3:
-                                        UserInterface.sync_to_usb(user.user_id)
-                                    case 4:
-                                        UserInterface.sync_from_usb(user.user_id)
-                                    case 5: 
-                                        choice: int = UserInterface.access_mfa_auth_data(user)
-
-                                        if user.is_mfa_enabled:
-                                            """IMPLEMENT MODIFY"""
-                                        else:
-                                            match choice:
-                                                case 1:
-                                                    UserInterface.add_email(user)
-                                                case 2:
-                                                    """IMPLEMENT ADD PHONE"""
-                                    case 0:
-                                        user.signout()
-                                        break
                         case 2:
-                            print("sign in with email.")
-                        case 3:
-                            print("sign in using contact number.")
+                            user: User = UserInterface.email_otp_signin()
+
+                    if not user: continue
+                    UserInterface.home_redirects(user)
+                    
                 case 0:
                     exit(1)
 
