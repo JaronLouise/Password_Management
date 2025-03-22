@@ -1,6 +1,6 @@
+#main.py
 import UserInterface
 from User import User
-
 
 
 def main() -> None:
@@ -32,9 +32,9 @@ def main() -> None:
                                     case 2:
                                         UserInterface.add_account(user.user_id)
                                     case 3:
-                                        print("Sync to USB.")
+                                        UserInterface.sync_to_usb(user.user_id)
                                     case 4:
-                                        print("Sync from USB.")
+                                        UserInterface.sync_from_usb(user.user_id)
                                     case 5: 
                                         choice: int = UserInterface.access_mfa_auth_data(user)
 
