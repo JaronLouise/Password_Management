@@ -5,6 +5,7 @@ from User import User
 from pwinput import pwinput
 from PasswordVault import PasswordVault
 from MultiFactorAuth import MultiFactorAuth
+from SyncManager import SyncManager
 
 
 def is_valid_email(email: str) -> bool:
@@ -447,3 +448,59 @@ def add_email(user: User) -> None:
             if choice == 0: break
         
     layout_sections("FOOTER")
+
+def sync_to_usb(user_id):
+    os.system("cls" if os.name == "nt" else "clear")
+    layout_sections("HEADER", "Sync to USB")
+    sync_manager = SyncManager()
+
+    usb_path = input("\tEnter the path to your USB drive: ").strip()
+
+    if not usb_path:
+        print("\n\t❌ Invalid USB path. Please try again.")
+        input("\nPress Enter to return to the home screen...")
+        return
+
+    success = sync_manager.sync_to_usb(usb_path, user_id) #Added user_id argument
+    if success:
+        print("\n\t✅ Data successfully synced to USB.")
+    else:
+        print("\n\t❌ Failed to sync data to USB.")
+
+    layout_sections("BODY")
+    input("\nPress Enter to return to the home screen...")
+
+def sync_from_usb(user_id):
+    os.system("cls" if os.name == "nt" else "clear")
+    layout_sections("HEADER", "Sync from USB")
+    sync_manager = SyncManager()
+
+    print("\n\t⚠️ This will overwrite the contents of your vault.")
+    print("\t⚠️ Sync to USB before backup retrieval is recommended.")
+
+    print("\n\tDo you wish to proceed?")
+    print("\t[1] Yes")
+    print("\t[2] No")
+
+    choice = input("\tChoice: ").strip()
+
+    if choice == "1":
+        usb_path = input("\tEnter the path to your USB drive: ").strip()
+
+        if not usb_path:
+            print("\n\t❌ Invalid USB path. Please try again.")
+            input("\nPress Enter to return to the home screen...")
+            return
+
+        success = sync_manager.sync_from_usb(usb_path, user_id) #Added user_id argument
+        if success:
+            print("\n\t✅ Data successfully synced from USB.")
+        else:
+            print("\n\t❌ Failed to sync data from USB.")
+    elif choice == "2":
+        print("\n\t❌ Sync from USB cancelled.")
+    else:
+        print("\n\t❌ Invalid choice. Sync from USB cancelled.")
+
+    layout_sections("BODY")
+    input("\nPress Enter to return to the home screen...")
