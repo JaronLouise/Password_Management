@@ -124,7 +124,6 @@ def signin() -> int:
 
         print("\t[1] Using username and password.")
         print("\t[2] Using OTP sent via email.")
-        print("\t[3] Using OTP sent via phone number.")
         print("\t[0] Exit")
 
         layout_sections("BODY")
@@ -146,13 +145,10 @@ def username_password_signin() -> User | None:
         user.username = input("\tUsername: ")
         user.password = pwinput("\tPassword: ", mask="*")
 
-        data: list = user.signin()
+        signed_in = user.signin("USERNAME PASSWORD")
 
-        if data:
-            user.user_id = data[0]["user_id"]
-            user.username = data[0]["username"]
-            user.is_mfa_enabled = data[0]["is_mfa_enabled"]
-
+        if signed_in:
+            user.get_user_data("USERNAME PASSWORD")
             print("\t✅ Signed in successfully!")
             return user
         else:
@@ -163,6 +159,29 @@ def username_password_signin() -> User | None:
         return None
     finally:
         layout_sections("FOOTER")
+
+def email_otp_signin() -> User | None:
+    layout_sections("HEADER", "Sign-In")
+
+    try:
+        user = User()
+        user.email = input("\tEmail: ").strip()
+
+        signed_in = user.signin("EMAIL OTP")
+
+        if signed_in:
+            user.get_user_data("EMAIL OTP")
+            print("\t✅ Signed in successfully!")
+            return user
+        else:
+            print("\t❌ Incorrect username or password.")
+            return None
+
+    except Exception as e:
+        print(f"{e}")
+    finally:
+        layout_sections("FOOTER")
+
 
 def home(user_id: str, username: str, mfa_enabled: bool):
     layout_sections("HEADER", "SecurePass - Home")
@@ -185,15 +204,43 @@ def home(user_id: str, username: str, mfa_enabled: bool):
 
     return int(input("Choice: "))
 
+def home_redirects(user: User):
+    while True:
+        choice: int = home(user.user_id, user.username, user.is_mfa_enabled)
+
+        match choice:
+            case 1:
+                view_accounts(user.user_id)
+            case 2:
+                add_account(user.user_id)
+            case 3:
+                print("Sync to USB.")
+            case 4:
+                print("Sync from USB.")
+            case 5: 
+                choice: int = access_mfa_auth_data(user)
+
+                if choice != 1: continue
+                
+                if user.is_mfa_enabled:
+                    new_user_data = modify_email(user)
+
+                    if new_user_data:
+                        user = new_user_data
+                else:
+                    add_email(user)
+            case 0:
+                user.signout()
+                break
+
 def access_mfa_auth_data(user: User):
     layout_sections("HEADER", "SecurePass - MFA")
     
     if user.is_mfa_enabled:
+        print(f"\t📩 Email: {user.email} \n")
         print("\t[1] Modify email.")
-        print("\t[2] Modify phone number.")
     else:
         print("\t[1] Add email.")
-        print("\t[2] Add phone number.")
 
     print("\t[0] Exit")
     layout_sections("BODY")
@@ -447,6 +494,31 @@ def add_email(user: User) -> None:
 
             if choice == 0: break
         
+    layout_sections("FOOTER")
+
+
+def modify_email(user: User) -> User | None:
+    layout_sections("HEADER", "SecurePass - Modify Email")
+
+    new_email = input("\tNew email: ")
+
+    print("\n\tTo continue this process enter your username.")
+    i_username = input("\tUsername: ")
+
+    try:
+        if i_username != user.username:
+            raise Exception("Incorrect username.")
+        
+        verified_email = user.verify_email(new_email)
+        if verified_email:
+            user.email = new_email
+            user.update_profile()
+
+            return user
+
+    except Exception as e:
+        print(f"\t❌ {e}")
+
     layout_sections("FOOTER")
 
 def sync_to_usb(user_id):
