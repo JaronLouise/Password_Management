@@ -1,7 +1,12 @@
 from typing import List
 from pathlib import Path
 from Data import UserData
-from json import dump, load, dumps, JSONDecodeError
+from json import dump, load, JSONDecodeError
+
+
+##
+## NOT INCLUDED IN THE CLASS DIAGRAM BECAUSE THIS IS ONLY A TEMPORARY STORAGE.
+##
 
 
 class DataFileHandler:
@@ -44,8 +49,6 @@ class DataFileHandler:
         try:
             with file_path.open("w", 1, "utf-8") as file:
                 dump(users, file, indent=4)
-                # for user in users:
-                #     file.write(dumps(user) + "\n")
             return True
         except Exception as e:
             raise OSError(f"Update failed: {e}")
