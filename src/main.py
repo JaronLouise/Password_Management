@@ -23,6 +23,8 @@ def main() -> None:
                             user: User = UserInterface.username_password_signin()
                         case 2:
                             user: User = UserInterface.email_otp_signin()
+                        case 0: 
+                            continue
 
                     if not user: continue
                     UserInterface.home_redirects(user)
